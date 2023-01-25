@@ -200,6 +200,13 @@ fn main() {
                                                         }
                                                     }
                                                 }
+                                                zriver_output_status_v1::Event::LayoutName {
+                                                    name,
+                                                } => {
+                                                }
+                                                zriver_output_status_v1::Event::LayoutNameClear {
+                                                } => {
+                                                }
                                             }
                                         }
                                     });
