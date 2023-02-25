@@ -122,24 +122,13 @@ fn main() {
             }],
             [WlOutput, 3, |output: Main<WlOutput>, _env: DispatchData| {
                 output.quick_assign(move |output, event, mut env| match event {
-                    wl_output::Event::Geometry {
-                        x: _,
-                        y: _,
-                        physical_width: _,
-                        physical_height: _,
-                        subpixel: _,
-                        mut make,
-                        model: _,
-                        transform: _,
-                    } => {
+                    wl_output::Event::Name { name } => {
                         if let Some(env) = env.get::<Env>() {
                             if env.flags.output.is_none()
-                                || env.flags.output.as_ref().unwrap().eq(&make)
+                                || name.eq(env.flags.output.as_ref().unwrap())
                             {
                                 if let Some(status_manager) = &env.status_manager {
-                                    make = make.replace(' ', "").to_string();
-                                    let output_status =
-                                        status_manager.get_river_output_status(&output);
+                                    let output_status = status_manager.get_river_output_status(&output);
                                     output_status.quick_assign(move |_, event, mut env| {
                                         if let Some(env) = env.get::<Env>() {
                                             match event {
@@ -148,12 +137,12 @@ fn main() {
                                                 } => {
                                                     if let Some(tags) = &mut env.tags {
                                                         if let Some(inner_value) =
-                                                            tags.get_mut(&make)
+                                                            tags.get_mut(&name)
                                                         {
                                                             (*inner_value) = Tags(focused_tags);
                                                         } else {
                                                             tags.insert(
-                                                                make.clone(),
+                                                                name.clone(),
                                                                 Tags(focused_tags),
                                                             );
                                                         }
@@ -178,11 +167,11 @@ fn main() {
                                                             })
                                                             .collect();
                                                         if let Some(inner_value) =
-                                                            viewstag.get_mut(&make)
+                                                            viewstag.get_mut(&name)
                                                         {
                                                             (*inner_value) = tags;
                                                         } else {
-                                                            viewstag.insert(make.clone(), tags);
+                                                            viewstag.insert(name.clone(), tags);
                                                         }
                                                     }
                                                 }
@@ -191,12 +180,12 @@ fn main() {
                                                 } => {
                                                     if let Some(urgency) = &mut env.urgency {
                                                         if let Some(inner_value) =
-                                                            urgency.get_mut(&make)
+                                                            urgency.get_mut(&name)
                                                         {
                                                             (*inner_value) = Tags(tags);
                                                         } else {
                                                             urgency
-                                                                .insert(make.clone(), Tags(tags));
+                                                                .insert(name.clone(), Tags(tags));
                                                         }
                                                     }
                                                 }
